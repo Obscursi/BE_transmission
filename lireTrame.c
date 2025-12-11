@@ -17,35 +17,51 @@ void affichebin(int n){
     printf("\n");
 }
 
+
 void lireAdresse(char * adr) {
 	printf("début de la lecture d'adresse (voici la trame en binaire) : ") ;
 
-	int * trame = (int *) ch ;
-	affichebin(*trame);
+	unsigned int trame = (unsigned) atoi(adr) ;
+	affichebin(trame);
 
-	int etage = ((*trame) & 4227858432) >> 26 ; 
+	unsigned int etage = (trame & 4227858432) >> 26 ; 
 	printf("etage   : %d\n",etage) ;
 
-	int chambre = ((*trame) & 67043328) >> 16 ;
+	unsigned int chambre = (trame & 67043328) >> 16 ;
 	printf("chambre : %d\n",chambre) ;
 
-	int capteur = ((*trame) & 61440) >> 12 ;
+	unsigned int capteur = (trame & 61440) >> 12 ;
 	printf("capteur : %d\n",capteur) ;
 
-	if(etage > 63 || etage <0 || chambre > 1023 || chambre < 0 || capteur > 15 || capteur < 0) {
+	if(etage > 63 || chambre > 1023 || capteur > 15) {
 		printf("erreur paramètres de l'adresse hors bornes\n");
 		exit(2) ;
 	}
 	printf("fin de lecture d'adresse\n\n") ;
 }
 
-int lireType(char * oct) { //faudra sans doute check à un autre endroit
-	printf("oct : %d\n", (int) (*oct)) ;
-	*oct = (*oct) >> 6 ;
-	int type = (int) (*oct) ;
+void lireTrame(char * ch) { //faudra sans doute check à un autre endroit
+	//int oct = (int) ch[0] ;
+	
+	unsigned int trame = (unsigned) atoi(ch) ;
+	printf("\naffichage binaire de la trame : ");
+	affichebin(trame);
+	printf("oct : %d\n", trame) ;
+	unsigned int type = trame >> 30 ;
+	unsigned int val = trame >> 24 ;
+	val = val & 63 ;
 	printf("type : %d\n", type) ;
-	return(type) ;
+	printf("valeur : %d\n", val) ;
+	if(type==3) { // type 3 on est sur une grande trame donc on doit lire 2 valeurs de plus
+		unsigned int min = trame >> 18 ;
+		min = min & 63 ;
+		unsigned int max = trame >> 12 ;
+		max = max & 63 ;
+		printf("min : %d\n", min) ;
+		printf("max : %d\n", max) ;
+	}
 }
+
 
 int main(int argc, char ** argv) {
 	(void)argc;
@@ -54,15 +70,16 @@ int main(int argc, char ** argv) {
 	FILE * inFile = fopen("trame.txt","r") ;
 	//lireAdresse(inFile) ;
 	//printf("%d",lireType(inFile)) ;
-	char * ch = malloc(sizeof(char)*4) ;
+	char * ch = malloc(sizeof(char)*11) ;
 	for(int i=0; i<2; i++) {
-		if(fgets(ch,4,inFile)!=null) {
-			switch i {
+		if(fgets(ch,11,inFile)!=NULL) {
+			printf("resultat fgets : %s\n",ch) ;
+			switch(i) {
 				case 0 :
 					lireAdresse(ch) ;
 					break ;
 				case 1 :
-					lireType(ch) ;
+					lireTrame(ch) ;
 					break ;
 			}
 		}

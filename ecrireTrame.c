@@ -33,7 +33,23 @@ void afficheBinOctet(char n){
     printf("\n");
 }
 
-void ecrireAdresse(int etage, int chambre, int capteur) {
+/*void afficheAdresse(int n){ //ne marche pas
+    unsigned u = (unsigned)n;   // On lit les bits 
+
+	int compteur = 0;
+
+    for (int i = 19; i >= 0; i--) {
+        unsigned bit = (u >> i) & 1;   // On décale, puis on lit le dernier bit
+        printf("%u", bit);
+		compteur++;
+		if (compteur==6 || compteur ==16){
+			printf(" || ");
+		}
+    }
+    printf("\n");
+}*/
+
+void ecrireAdresse(unsigned int etage, unsigned int chambre, unsigned int capteur) {
 
 	etage = etage << 26 ;
 	printf("Etage    : ") ;
@@ -47,7 +63,7 @@ void ecrireAdresse(int etage, int chambre, int capteur) {
 	printf("Capteur  : ") ;
 	affichebin(capteur);
 
-	int trame = etage | chambre ;
+	unsigned int trame = etage | chambre ;
 	trame = trame | capteur ;
 
 	printf("Résultat : ");
@@ -62,14 +78,14 @@ void ecrireAdresse(int etage, int chambre, int capteur) {
 	fclose(outFile) ;
 }
 
-void ecrireTrameCourte(int type, int valeur) {
-	if(type < 0 || type > 3 || valeur < 0 || valeur > 63) {
+void ecrireTrameCourte(unsigned int type, unsigned int valeur) {
+	if(type > 3 || valeur > 63) {
 		printf("arguments hors bornes\n") ;
 		exit(2) ;
 	}
 
 	type=type << 6;
-	char * trame = malloc(sizeof(char)) ;
+	unsigned int * trame = malloc(sizeof(int)) ;
 	printf("type     : ");
 	afficheBinOctet(type);
 	printf("valeur   : ");
@@ -83,28 +99,39 @@ void ecrireTrameCourte(int type, int valeur) {
 	
 
 	FILE * outFile = fopen("trame.txt","a") ;
-	fprintf(outFile, "%c\n", (*trame)) ;
+	fprintf(outFile, "%d\n", (*trame) << 24) ;
 	fclose(outFile) ;
 }
 
-void ecrireTrameCapteur(int type, int moy, int min, int max) {
-	if(type < 0 || type > 3 || moy < 0 || moy > 63 || min < 0 || min > 63 || max < 0 || max > 63) {
+void ecrireTrameCapteur(unsigned int type, unsigned int moy, unsigned int min, unsigned int max) {
+	if(type > 3 || moy > 63 || min > 63 || max > 63) {
 		printf("arguments hors bornes") ;
 		exit(2) ;
 	}
-	int * trame = malloc(sizeof(int)) ;
+	unsigned int * trame = malloc(sizeof(int)) ;
 	*trame = (type << 30) | (moy << 24) | (min << 18) | (max << 12) ;
+	/**trame = (type << 22) | (moy << 16) | (min << 10) | (max << 4) ;
+	char c1 = (char) (*trame) ;
+	*trame = (*trame) >> 8 ;
+	char c2 = (char) (*trame) ;
+	*trame = (*trame) >> 8 ;
+	char c3 = (char) (*trame) ;*/
 	FILE * outFile = fopen("trame.txt","a") ;
-	fprintf(outFile, "%d\n", (*trame)) ;
+	/*fprintf(outFile, "%c\n", c1) ;
+	printf("char 1 : %c\n", c1) ;
+	printf("char 1 int : %d\n", (int) c1) ;
+	fprintf(outFile, "%c\n", c2) ;
+	printf("char 2 : %c\n", c2) ;
+	printf("char 2 int : %d\n", (int) c2) ;
+	fprintf(outFile, "%c\n", c3) ;
+	printf("char 3 : %c\n", c3) ;
+	printf("char 3 int : %d\n", (int) c3) ;*/
+	fprintf(outFile, "%d\n",(*trame)) ;
 	fclose(outFile) ;
 }
 
 int main(int argc, char ** argv) {
-	if(argc!=4) {
-		printf("Il faut 3 arguments\n") ;
-		return(1) ;
-	}
-	else {
+	if(argc==6) {
 		int etage = atoi(argv[1]) ;
 		int chambre = atoi(argv[2]) ;
 		int capteur = atoi(argv[3]) ;
@@ -113,7 +140,27 @@ int main(int argc, char ** argv) {
 			return(2) ;
 		}
 		ecrireAdresse(etage,chambre,capteur) ;	
-		ecrireTrameCourte(1,55) ;
+		int type = atoi(argv[4]) ;
+		int val = atoi(argv[5]) ;
+		ecrireTrameCourte(type,val) ;
+	}
+	else if(argc==8) {
+		int etage = atoi(argv[1]) ;
+		int chambre = atoi(argv[2]) ;
+		int capteur = atoi(argv[3]) ;
+		if(etage > 63 || etage <0 || chambre > 1023 || chambre < 0 || capteur > 15 || capteur < 0) {
+			printf("arguments hors bornes\n");
+			return(2) ;
+		}
+		ecrireAdresse(etage,chambre,capteur) ;	
+		int type = atoi(argv[4]) ;
+		int val = atoi(argv[5]) ;
+		int min = atoi(argv[6]) ;
+		int max = atoi(argv[7]) ;
+		ecrireTrameCapteur(type,val,min,max) ;
+	}
+	else {
+		printf("Nombre d'arguments incohérent, 5 pour une trame courte ou 7 pur une trame longue\n") ;
 	}
 	return(0) ;
 }
