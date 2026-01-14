@@ -12,9 +12,7 @@ do
 		echo on a reçu une nouvelle trame : 
 		cat ./trame.txt
 		./lireTrame.out >> fichierAutomatisation.txt
-		#./testLire.out
 		rm -f trame.txt
 		touch trame.txt
-		#echo -n "" > trame.txt
 	fi
 done

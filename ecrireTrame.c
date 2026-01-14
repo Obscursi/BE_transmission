@@ -171,7 +171,7 @@ void ecrireTrameCapteur(unsigned int type, unsigned int moy, unsigned int min, u
 	fclose(outFile) ;
 }
 
-int main(int argc, char ** argv) {
+int lanceurEnvoi(int argc, char ** argv) {
 	if(argc==6) {
 		int etage = atoi(argv[1]) ;
 		int chambre = atoi(argv[2]) ;
@@ -229,4 +229,8 @@ int main(int argc, char ** argv) {
 		printf("Nombre d'arguments incohérent, 5 arguments pour une trame courte ou 7 arguments pour une trame longue\n") ;
 	}
 	return(0) ;
+}
+
+int main(int argc, char ** argv) {
+	lanceurEnvoi(argc,argv) ;
 }

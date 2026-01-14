@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "ecrireTrame.h"
 
 
 void affichebin(int n){
@@ -19,7 +20,7 @@ void affichebin(int n){
 }
 
 
-void lireAdresse(char * adr) {
+int * lireAdresse(char * adr) {
 	printf("début de la lecture d'adresse (voici la trame en binaire) : ") ;
 
 	unsigned int trame = (unsigned) atoi(adr) ;
@@ -53,6 +54,17 @@ void lireTrame(char * ch) { //faudra sans doute check à un autre endroit
 	val = val & 63 ;
 	printf("type : %d\n", type) ;
 	printf("valeur : %d\n", val) ;
+	if(type==0) {
+		//trame alerte => envoi d'une trame ACK
+		char ** tabString = ["2"]
+		lanceurEnvoi(5)
+	}
+	if(type==1) {
+		//trame capteur => envoi d'une trame ACK
+	}
+	if(type==2) {
+		//trame ACK
+	}
 	if(type==3) { // type 3 on est sur une grande trame donc on doit lire 2 valeurs de plus
 		unsigned int min = trame >> 18 ;
 		min = min & 63 ;
