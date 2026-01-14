@@ -9,4 +9,3 @@ echo -e "\nexécution avec les paramètres étage=7, chambre=12 et capteur=8, tr
 ./ecrireTrame.out 7 12 8 3 37 7 58
 echo -e "\nlecture de la trame : ---------------------------------------------------------------------------------------------------\n"
 ./lireTrame.out
-

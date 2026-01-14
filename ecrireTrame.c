@@ -33,6 +33,30 @@ void afficheBinOctet(char n){
     printf("\n");
 }
 
+long int findSizeFile(char file_name[])
+{
+    // opening the file in read mode
+    FILE* fp = fopen(file_name, "r");
+
+    // checking if the file exist or not
+    if (fp == NULL) {
+        printf("File Not Found!\n");
+        return -1;
+    }
+
+    fseek(fp, 0L, SEEK_END);
+
+    // calculating the size of the file
+    long int res = ftell(fp);
+
+    // closing the file
+    fclose(fp);
+
+    return res;
+}
+
+	
+
 /*void afficheAdresse(int n){ //ne marche pas
     unsigned u = (unsigned)n;   // On lit les bits 
 
@@ -48,6 +72,22 @@ void afficheBinOctet(char n){
     }
     printf("\n");
 }*/
+
+void ecrirePaddingEtHeader(char * motif, int nb, char * wOra) {
+	FILE * outFile= fopen("trame.txt",wOra) ;
+
+	
+	for(int i=0; i<nb; i++) {
+		fprintf(outFile, "%s", motif) ;
+	}
+	fprintf(outFile, "\n%d\n", 1234567890) ;
+	fclose(outFile) ;
+}
+
+void clearFile() {
+	FILE * outFile = fopen("trame.txt","w") ;
+	fclose(outFile) ;
+}
 
 void ecrireAdresse(unsigned int etage, unsigned int chambre, unsigned int capteur) {
 
@@ -73,7 +113,7 @@ void ecrireAdresse(unsigned int etage, unsigned int chambre, unsigned int capteu
 	printf("Nombre correspondant à l'adresse finale : %d\n",trame) ;
 	printf("adresse finie d'être construite, on sort du fichier trame.txt \n\n");
 
-	FILE * outFile = fopen("trame.txt","w") ;
+	FILE * outFile = fopen("trame.txt","a") ;
 	fprintf(outFile, "%d\n", trame) ;
 	fclose(outFile) ;
 }
@@ -102,6 +142,7 @@ void ecrireTrameCourte(unsigned int type, unsigned int valeur) {
 	fprintf(outFile, "%d\n", (*trame) << 24) ;
 	fclose(outFile) ;
 }
+//0 alerte, 1 actionneur 2 ACK
 
 void ecrireTrameCapteur(unsigned int type, unsigned int moy, unsigned int min, unsigned int max) {
 	if(type > 3 || moy > 63 || min > 63 || max > 63) {
@@ -139,10 +180,23 @@ int main(int argc, char ** argv) {
 			printf("arguments hors bornes\n");
 			return(2) ;
 		}
+		clearFile() ;
+		//ecrirePaddingEtHeader("0000",8) ; //attention si modif modif lireTrame
 		ecrireAdresse(etage,chambre,capteur) ;	
 		int type = atoi(argv[4]) ;
 		int val = atoi(argv[5]) ;
 		ecrireTrameCourte(type,val) ;
+		long sizeFile = findSizeFile("trame.txt");
+		int taillePadding = 24-sizeFile; //entier+\n =12 par ligne = 24 (caractère fin de fichier ne compte pas)
+		
+		char * charAppend="w";
+		for (int i=0;i<3;i++){
+			ecrirePaddingEtHeader("0",taillePadding,charAppend) ; //attention si modif modif lireTrame
+			charAppend="a"; //maintenant on efface plus on append la trame (on l'écrit trois fois en tout)
+			ecrireAdresse(etage,chambre,capteur) ;	
+			ecrireTrameCourte(type,val) ;		
+		}
+
 	}
 	else if(argc==8) {
 		int etage = atoi(argv[1]) ;
@@ -152,15 +206,27 @@ int main(int argc, char ** argv) {
 			printf("arguments hors bornes\n");
 			return(2) ;
 		}
+		clearFile() ;
+		//ecrirePaddingEtHeader("0000",8) ; //attention si modif modif lireTrame
 		ecrireAdresse(etage,chambre,capteur) ;	
 		int type = atoi(argv[4]) ;
 		int val = atoi(argv[5]) ;
 		int min = atoi(argv[6]) ;
 		int max = atoi(argv[7]) ;
 		ecrireTrameCapteur(type,val,min,max) ;
+		long sizeFile = findSizeFile("trame.txt");
+		int taillePadding = 24-sizeFile; //entier+\n =12 par ligne =24
+		
+		char * charAppend="w";
+		for (int i=0;i<3;i++){
+			ecrirePaddingEtHeader("0",taillePadding,charAppend) ; //attention si modif modif lireTrame
+			charAppend="a"; //maintenant on efface plus on append la trame (on l'écrit trois fois en tout)
+			ecrireAdresse(etage,chambre,capteur) ;	
+			ecrireTrameCapteur(type,val,min,max);		
+		}
 	}
 	else {
-		printf("Nombre d'arguments incohérent, 5 pour une trame courte ou 7 pur une trame longue\n") ;
+		printf("Nombre d'arguments incohérent, 5 arguments pour une trame courte ou 7 arguments pour une trame longue\n") ;
 	}
 	return(0) ;
 }

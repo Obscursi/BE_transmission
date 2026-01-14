@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 void affichebin(int n){
     unsigned u = (unsigned)n;   // On lit les bits 
 
@@ -70,21 +71,29 @@ int main(int argc, char ** argv) {
 	FILE * inFile = fopen("trame.txt","r") ;
 	//lireAdresse(inFile) ;
 	//printf("%d",lireType(inFile)) ;
-	char * ch = malloc(sizeof(char)*11) ;
-	for(int i=0; i<2; i++) {
-		if(fgets(ch,11,inFile)!=NULL) {
+	char * ch = malloc(sizeof(char)*40) ;
+	for(int i=0; i<4; i++) {
+		if(fgets(ch,40,inFile)!=NULL) { // normalement 40 octets est plus que ce  dont a besoin par ligne
 			printf("resultat fgets : %s\n",ch) ;
 			switch(i) {
-				case 0 :
+				case 1 :
+					int head = atoi(ch) ;
+					if(!(head==1234567890)) {
+						printf("header non valide %d\n", head) ;
+						exit(1) ;
+					}
+					printf("header valide %d\n", head) ;
+					break ;
+				case 2 :
 					lireAdresse(ch) ;
 					break ;
-				case 1 :
+				case 3 :
 					lireTrame(ch) ;
 					break ;
 			}
 		}
 	}
-	
+	printf("\n -------------------------------------------------------------------------------------------------------- \n");
 	fclose(inFile) ;
 	
 	return(0) ;

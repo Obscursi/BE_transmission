@@ -1,0 +1,57 @@
+resultat fgets : 
+resultat fgets : 
+header non valide 0
+resultat fgets : 
+resultat fgets : 
+header non valide 0
+resultat fgets : 
+resultat fgets : 
+header non valide 0
+resultat fgets : 000
+
+resultat fgets : 1234567890
+
+header valide 1234567890
+resultat fgets : 806141952
+
+début de la lecture d'adresse (voici la trame en binaire) : 00110000 00001100 11000000 00000000 
+etage   : 12
+chambre : 12
+capteur : 12
+fin de lecture d'adresse
+
+resultat fgets : -648433664
+
+
+affichage binaire de la trame : 11011001 01011001 10110000 00000000 
+oct : -648433664
+type : 3
+valeur : 25
+min : 22
+max : 27
+
+ -------------------------------------------------------------------------------------------------------- 
+resultat fgets : 00
+
+resultat fgets : 1234567890
+
+header valide 1234567890
+resultat fgets : 1007677440
+
+début de la lecture d'adresse (voici la trame en binaire) : 00111100 00001111 11110000 00000000 
+etage   : 15
+chambre : 15
+capteur : 15
+fin de lecture d'adresse
+
+resultat fgets : -648433664
+
+
+affichage binaire de la trame : 11011001 01011001 10110000 00000000 
+oct : -648433664
+type : 3
+valeur : 25
+min : 22
+max : 27
+
+ -------------------------------------------------------------------------------------------------------- 
